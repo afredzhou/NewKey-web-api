@@ -1,0 +1,36 @@
+service: p21-0008-lustre-web-api
+custom:
+  bucket: kaiyannewkey
+  quoteTable: NewKeyTable_
+provider:
+  name: aws
+  runtime: nodejs12.x
+  # you can overwrite defaults here
+  stage: dev
+  region: us-east-1
+  environment:
+    bucketName: ${self:custom.bucket}
+    region: ${self:provider.region}
+    quotes: ${self:custom.quoteTable}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+         - dynamodb:*
+         - s3:*
+      Resource: "*"
+
+functions:
+  updateUserPicture:
+    handler: api/updatePicture.upload
+    events:
+      - http:
+          path: uploadImage
+          method: post 
+          cors: true
+  dailyQuote:
+    handler: api/getRandomQuotes.getQuote
+    events:
+      - http:
+          path: quote
+          method: get 
+          cors: true
